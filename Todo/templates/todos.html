@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo App</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* CSS class for strikethrough effect */
+        .strikethrough {
+            text-decoration: line-through;
+            color: gray;
+            /* Optional: Change the color of strikethrough text */
+        }
+    </style>
+    <script>
+        // JavaScript function to toggle the display of todos and change button text
+        function toggleTodos(button) {
+            const todosDiv = document.getElementById('todos-list');
+            if (todosDiv.style.display === 'none' || todosDiv.style.display === '') {
+                todosDiv.style.display = 'block'; // Show the todos
+                button.innerText = 'Hide Todos'; // Change button text to "Hide Todos"
+            } else {
+                todosDiv.style.display = 'none'; // Hide the todos
+                button.innerText = 'Show Todos'; // Change button text to "Show Todos"
+            }
+        }
+
+        // Function to prevent the toggle from firing when clicking delete or update buttons
+        function stopPropagation(event) {
+            event.stopPropagation();
+        }
+
+        // Function to toggle strikethrough on the task
+        function toggleStrikethrough(event) {
+            const liElement = event.target.closest('li'); // Get the closest <li> element
+            liElement.classList.toggle('strikethrough'); // Toggle the strikethrough class
+        }
+    </script>
+</head>
+
+<body>
+    <div class="container d-flex justify-content-center align-items-center"
+        style="width: 100vw; flex-direction:column;">
+        <h4 class="pt-3" style="color: rgba(128, 128, 128, 3); font-family:sans-serif;">Manage your daily Todos:</h4>
+        <br>
+        <div class="card w-f" style="width: auto;">
+            <div class="card-body shadow-lg bg-body-tertiary rounded-5">
+                <form action="{{ url_for('todo') }}" method="POST">
+                    <div class="form-group">
+                        <label for="todo">Todo:</label>
+                        <input type="text" class="form-control" id="todo" name="todo"
+                            placeholder="Enter your task here">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Todo</button>
+                    <button type="button" class="btn btn-success" onclick="toggleTodos(this)">Show Todos</button>
+                </form>
+            </div>
+        </div>
+        <br>
+        <div class="todos">
+            <div class="card" style="width: 18rem;">
+                <div class="card-header text-center">
+                    Your Today's Tasks
+                </div>
+                <ul class="list-group list-group-flush" id="todos-list" style="display: none;">
+                    {% for todo in todos %}
+                    <li class="list-group-item">
+                        <span>{{ loop.index }}. {{ todo }}</span>
+                        <div class="row">
+                            <form action="{{ url_for('delete', id=loop.index0) }}" class="col-md-6 mb-3" method="POST"
+                                onsubmit="stopPropagation(event)">
+                                <button type="submit" class="btn btn-danger btn-block">Delete</button>
+                            </form>
+                            <button type="button" class="btn btn-warning btn-block col-md-6 mb-3"
+                                onclick="toggleStrikethrough(event)">Update</button>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
